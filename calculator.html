@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Calculator | Pro Suite</title>
+
+    <style>
+        /* ==========================================================================
+           1. GLOBAL VARIABLES & BASE STYLES
+           ========================================================================== */
+        :root {
+            --bg-dark: #0f172a;
+            --calc-bg-pc: rgba(30, 41, 59, 0.75);
+            --calc-bg-mobile: #1e293b;
+            --accent-blue: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.35);
+            --btn-num: #334155;
+            --btn-op: #0284c7;
+            --btn-sci: #475569;
+            --btn-toggle: #6366f1;
+            --btn-eq: #10b981;
+            --tab-active: #38bdf8;
+            --tab-inactive: #475569;
+        }
+
+        body {
+            margin: 0;
+            padding: 15px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* Navigation Floating Back Button */
+        .home-fixed {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 55px;
+            height: 55px;
+            background: var(--accent-blue);
+            color: var(--bg-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 24px;
+            text-decoration: none;
+            box-shadow: 0 8px 24px var(--accent-glow);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 9999;
+        }
+
+        /* ==========================================================================
+           2. TABS NAVIGATION
+           ========================================================================== */
+        .tab-container {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--tab-active);
+            color: var(--bg-dark);
+        }
+
+        /* ==========================================================================
+           3. CHASSIS & SECTIONS
+           ========================================================================== */
+        .calculator {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 24px;
+            padding: 25px;
+            box-sizing: border-box;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: max-width 0.3s ease;
+            overflow: hidden;
+        }
+
+        .calculator.sci-active { max-width: 500px; }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        /* ==========================================================================
+           4. CALCULATOR SPECIFIC UI
+           ========================================================================== */
+        .display {
+            background-color: #020617;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: right;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            min-height: 100px;
+        }
+
+        .display-header { display: flex; justify-content: space-between; align-items: center; }
+        .history-trigger { background: transparent; border: none; color: #64748b; font-size: 18px; cursor: pointer; }
+        #history { font-size: 14px; color: #64748b; font-family: monospace; }
+
+        #result-container {
+            font-size: 32px; font-weight: 700; color: #ffffff;
+            margin-top: 10px; font-family: monospace;
+            display: flex; justify-content: flex-end; align-items: center; white-space: pre;
+        }
+
+        .dynamic-cursor {
+            width: 2px; height: 32px; background-color: var(--accent-blue);
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { from, to { background-color: transparent } 50% { background-color: var(--accent-blue); } }
+
+        .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .calculator.sci-active .buttons { grid-template-columns: repeat(5, 1fr); }
+
+        button { border: none; padding: 15px 5px; border-radius: 12px; font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; transition: 0.2s; touch-action: manipulation; }
+        button:active { transform: scale(0.95); opacity: 0.8; }
+
+        .number { background: var(--btn-num); }
+        .operator { background: var(--btn-op); }
+        .scientific { background: var(--btn-sci); display: none; font-size: 14px; }
+        .calculator.sci-active .scientific { display: block; }
+        .equal { background: var(--btn-eq); }
+        .clear { background: #ef4444; }
+        .mode-toggle { background: var(--btn-toggle); grid-column: span 4; }
+        .calculator.sci-active .mode-toggle { grid-column: span 5; }
+
+        /* ==========================================================================
+           5. UNIT CONVERTER UI
+           ========================================================================== */
+        .converter-container { padding: 10px 0; }
+        .conv-group { margin-bottom: 20px; }
+        .conv-label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .conv-input, .conv-select {
+            width: 100%; background: #020617; border: 1px solid rgba(255,255,255,0.1);
+            color: white; padding: 12px; border-radius: 10px; font-size: 16px; outline: none;
+        }
+
+        .conv-result-box {
+            background: rgba(56, 189, 248, 0.1); border: 1px dashed var(--accent-blue);
+            border-radius: 12px; padding: 20px; text-align: center; margin-top: 20px;
+        }
+        #conv-output { font-size: 20px; font-weight: 700; color: var(--accent-blue); word-wrap: break-word; font-family: monospace; }
+
+        /* ==========================================================================
+           6. HISTORY DRAWER
+           ========================================================================== */
+        .history-panel {
+            position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: #111827; z-index: 100; transition: 0.3s; padding: 20px; box-sizing: border-box;
+            display: flex; flex-direction: column;
+        }
+        .history-panel.open { left: 0; }
+        .history-list { flex-grow: 1; overflow-y: auto; }
+        .history-item { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 10px; margin-bottom: 8px; cursor: pointer; text-align: right; }
+        .item-expr { font-size: 12px; color: #94a3b8; }
+        .item-res { font-size: 16px; color: #fff; font-weight: bold; }
+
+        /* ==========================================================================
+           7. THEMES & RESPONSIVE
+           ========================================================================== */
+        @media (min-width: 769px) {
+            .calculator { background: var(--calc-bg-pc); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+            button:hover { filter: brightness(1.2); }
+        }
+        @media (max-width: 768px) {
+            .calculator { background: var(--calc-bg-mobile); border: none; padding: 20px; }
+            .calculator.sci-active { max-width: 100%; border-radius: 0; height: 100vh; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="calcChassis" class="calculator">
+        
+        <div class="tab-container">
+            <button class="tab-btn active" id="tab-calc">Calculator</button>
+            <button class="tab-btn" id="tab-conv">Converter</button>
+        </div>
+
+        <div id="historyPanel" class="history-panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0">History</h3>
+                <button id="closeHistory" style="background:none; border:none; color:#ef4444; font-size:20px; cursor:pointer">✕</button>
+            </div>
+            <div class="history-list" id="historyList"></div>
+            <button id="clearHistory" style="background:#ef4444; color:#fff; border:none; padding:10px; border-radius:8px; cursor:pointer">Clear Logs</button>
+        </div>
+
+        <div id="calculator-view" class="view-section active">
+            <div class="display">
+                <div class="display-header">
+                    <button class="history-trigger" id="openHistory">🕒</button>
+                    <div id="history"></div>
+                </div>
+                <div id="result-container">
+                    <span id="text-left"></span>
+                    <span id="cursor" class="dynamic-cursor"></span>
+                    <span id="text-right"></span>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button class="scientific" data-action="sci-sin">sin</button>
+                <button class="clear" data-action="clear">C</button>
+                <button class="operator" data-action="backspace">⌫</button>
+                <button class="operator" data-val="(">(</button>
+                <button class="operator" data-val=")">)</button>
+
+                <button class="scientific" data-action="sci-cos">cos</button>
+                <button class="number" data-val="7">7</button>
+                <button class="number" data-val="8">8</button>
+                <button class="number" data-val="9">9</button>
+                <button class="operator" data-val="/">÷</button>
+
+                <button class="scientific" data-action="sci-tan">tan</button>
+                <button class="number" data-val="4">4</button>
+                <button class="number" data-val="5">5</button>
+                <button class="number" data-val="6">6</button>
+                <button class="operator" data-val="*">×</button>
+
+                <button class="scientific" data-action="sci-sqrt">√</button>
+                <button class="number" data-val="1">1</button>
+                <button class="number" data-val="2">2</button>
+                <button class="number" data-val="3">3</button>
+                <button class="operator" data-val="-">−</button>
+
+                <button class="scientific" data-action="sci-sqr">x²</button>
+                <button class="number" data-val="0">0</button>
+                <button class="number" data-val=".">.</button>
+                <button class="operator" data-val="+">+</button>
+                <button class="operator" data-val="%">%</button>
+
+                <button class="scientific" data-action="sci-log">log</button>
+                <button class="scientific" data-val="Math.PI">π</button>
+                <button class="scientific" data-val="Math.E">e</button>
+                <button class="scientific" data-val="**">xʸ</button>
+                <button class="equal" id="eqKey" data-action="calculate">=</button>
+                
+                <button class="mode-toggle" id="toggleBtn" data-action="toggle-mode">Scientific Mode</button>
+            </div>
+        </div>
+
+        <div id="converter-view" class="view-section">
+            <div class="converter-container">
+                <div class="conv-group">
+                    <label class="conv-label">Category</label>
+                    <select class="conv-select" id="conv-category">
+                        <option value="length">Length (All Scales)</option>
+                        <option value="weight">Weight</option>
+                        <option value="temp">Temperature</option>
+                    </select>
+                </div>
+
+                <div class="conv-group">
+                    <label class="conv-label">From</label>
+                    <input type="number" class="conv-input" id="conv-value" placeholder="Enter value">
+                    <select class="conv-select" id="conv-from" style="margin-top:10px;"></select>
+                </div>
+
+                <div class="conv-group">
+                    <label class="conv-label">To</label>
+                    <select class="conv-select" id="conv-to"></select>
+                </div>
+
+                <div class="conv-result-box">
+                    <label class="conv-label">Result</label>
+                    <div id="conv-output">0</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <a href="projects.html" class="home-fixed">📂</a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- UI Elements ---
+            const calcChassis = document.getElementById('calcChassis');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const resultLeft = document.getElementById('text-left');
+            const resultRight = document.getElementById('text-right');
+            const historyText = document.getElementById('history');
+            const historyPanel = document.getElementById('historyPanel');
+            const historyList = document.getElementById('historyList');
+            const cursor = document.getElementById('cursor');
+
+            const calcTab = document.getElementById('tab-calc');
+            const convTab = document.getElementById('tab-conv');
+            const calcView = document.getElementById('calculator-view');
+            const convView = document.getElementById('converter-view');
+
+            let currentInput = '0';
+            let cursorPosition = 1;
+            let isEvaluated = false;
+            let isSciMode = false;
+            let memory = [];
+
+            // --- Tab Switching Logic ---
+            calcTab.addEventListener('click', () => {
+                calcTab.classList.add('active'); convTab.classList.remove('active');
+                calcView.classList.add('active'); convView.classList.remove('active');
+                calcChassis.classList.remove('sci-active'); 
+                if(isSciMode) calcChassis.classList.add('sci-active');
+            });
+
+            convTab.addEventListener('click', () => {
+                convTab.classList.add('active'); calcTab.classList.remove('active');
+                convView.classList.add('active'); calcView.classList.remove('active');
+                calcChassis.classList.remove('sci-active');
+                initConverter();
+            });
+
+            // --- Calculator Engine ---
+            document.querySelector('.buttons').addEventListener('click', (e) => {
+                const target = e.target;
+                if (!target.matches('button')) return;
+                const val = target.dataset.val;
+                const action = target.dataset.action;
+
+                cursor.style.display = "inline-block";
+
+                if (val) append(val);
+                else if (action) {
+                    if (action.startsWith('sci-')) scientific(action.replace('sci-', ''));
+                    else if (action === 'clear') clear();
+                    else if (action === 'backspace') backspace();
+                    else if (action === 'calculate') calculate();
+                    else if (action === 'toggle-mode') toggleMode();
+                }
+            });
+
+            function append(val) {
+                if (isEvaluated) { currentInput = ''; cursorPosition = 0; isEvaluated = false; }
+                if (currentInput === '0' && !isNaN(val)) { currentInput = val; cursorPosition = 1; }
+                else {
+                    currentInput = currentInput.slice(0, cursorPosition) + val + currentInput.slice(cursorPosition);
+                    cursorPosition += val.length;
+                }
+                updateDisplay();
+            }
+
+            function clear() { currentInput = '0'; cursorPosition = 1; historyText.innerText = ''; isEvaluated = false; updateDisplay(); }
+
+            function backspace() {
+                if (cursorPosition === 0) return;
+                let len = 1;
+                if (currentInput.slice(0, cursorPosition).endsWith('Math.PI')) len = 7;
+                else if (currentInput.slice(0, cursorPosition).endsWith('Math.E')) len = 6;
+                else if (currentInput.slice(0, cursorPosition).endsWith('**')) len = 2;
+                currentInput = currentInput.slice(0, cursorPosition - len) + currentInput.slice(cursorPosition);
+                cursorPosition -= len;
+                if (currentInput === '') { currentInput = '0'; cursorPosition = 1; }
+                updateDisplay();
+            }
+
+            function scientific(type) {
+                try {
+                    let oldInput = currentInput;
+                    let expr = currentInput.replace(/×/g, '*').replace(/÷/g, '/');
+                    let numericValue = Function('"use strict"; return (' + expr + ')')();
+                    let calculationTitle = '';
+                    
+                    switch (type) {
+                        case 'sin': calculationTitle = `sin(${oldInput})`; currentInput = Math.sin(numericValue * Math.PI / 180).toString(); break;
+                        case 'cos': calculationTitle = `cos(${oldInput})`; currentInput = Math.cos(numericValue * Math.PI / 180).toString(); break;
+                        case 'tan': calculationTitle = `tan(${oldInput})`; currentInput = Math.tan(numericValue * Math.PI / 180).toString(); break;
+                        case 'log': calculationTitle = `log(${oldInput})`; currentInput = Math.log10(numericValue).toString(); break;
+                        case 'sqrt': calculationTitle = `√(${oldInput})`; currentInput = Math.sqrt(numericValue).toString(); break;
+                        case 'sqr': calculationTitle = `(${oldInput})²`; currentInput = Math.pow(numericValue, 2).toString(); break;
+                    }
+                    if (!isNaN(currentInput)) currentInput = Number(parseFloat(currentInput).toFixed(8)).toString();
+                    historyText.innerText = calculationTitle;
+                    memory.unshift({ expr: calculationTitle, res: currentInput });
+                    renderHistory();
+                    cursorPosition = currentInput.length; isEvaluated = true;
+                } catch { currentInput = 'Error'; isEvaluated = true; }
+                updateDisplay();
+            }
+
+            function calculate() {
+                try {
+                    let expr = currentInput.replace(/×/g, '*').replace(/÷/g, '/');
+                    let res = Function('"use strict"; return (' + expr + ')')();
+                    res = Number(res.toFixed(8)).toString();
+                    historyText.innerText = currentInput + ' =';
+                    memory.unshift({ expr: currentInput, res });
+                    renderHistory();
+                    currentInput = res; cursorPosition = res.length; isEvaluated = true; cursor.style.display = "none";
+                } catch { currentInput = 'Error'; isEvaluated = true; }
+                updateDisplay();
+            }
+
+            function toggleMode() {
+                isSciMode = !isSciMode;
+                calcChassis.classList.toggle('sci-active');
+                toggleBtn.innerText = isSciMode ? "Basic Mode" : "Scientific Mode";
+            }
+
+            function updateDisplay() {
+                const format = (s) => s.replace(/\*\*/g, '^').replace(/Math\.PI/g, 'π').replace(/Math\.E/g, 'e').replace(/\*/g, '×').replace(/\//g, '÷');
+                resultLeft.innerText = format(currentInput.slice(0, cursorPosition));
+                resultRight.innerText = format(currentInput.slice(cursorPosition));
+            }
+
+            // --- History Logic ---
+            document.getElementById('openHistory').onclick = () => historyPanel.classList.add('open');
+            document.getElementById('closeHistory').onclick = () => historyPanel.classList.remove('open');
+            document.getElementById('clearHistory').onclick = () => { memory = []; renderHistory(); };
+
+            function renderHistory() {
+                historyList.innerHTML = memory.length ? '' : '<div style="text-align:center;color:#64748b;margin-top:20px">No logs</div>';
+                memory.forEach(item => {
+                    const div = document.createElement('div'); div.className = 'history-item';
+                    div.innerHTML = `<div class="item-expr">${item.expr}</div><div class="item-res">${item.res}</div>`;
+                    div.onclick = () => { append(item.res); historyPanel.classList.remove('open'); };
+                    historyList.appendChild(div);
+                });
+            }
+
+            // --- Comprehensive Unit Converter Database (Base unit meters 'm' / grams 'g') ---
+            const units = {
+                length: {
+                    "Attometer (am)": 1e-18,
+                    "Femtometer (fm)": 1e-15,
+                    "Picometer (pm)": 1e-12,
+                    "Nanometer (nm)": 1e-9,
+                    "Micrometer (μm)": 1e-6,
+                    "Millimeter (mm)": 0.001,
+                    "Centimeter (cm)": 0.01,
+                    "Decimeter (dm)": 0.1,
+                    "Meter (m)": 1,
+                    "Kilometer (km)": 1000,
+                    "Inch (in)": 0.0254,
+                    "Foot (ft)": 0.3048,
+                    "Yard (yd)": 0.9144,
+                    "Mile (mi)": 1609.344,
+                    "Nautical Mile (nmi)": 1852,
+                    "Light-year (ly)": 9.46073e15,
+                    "Parsec (pc)": 3.085677581e16
+                },
+                weight: {
+                    "Microgram (μg)": 1e-6,
+                    "Milligram (mg)": 0.001,
+                    "Gram (g)": 1,
+                    "Kilogram (kg)": 1000,
+                    "Ounce (oz)": 28.349523125,
+                    "Pound (lb)": 453.59237,
+                    "Stone (st)": 6350.29318,
+                    "Ton (t)": 1000000
+                },
+                temp: ['Celsius', 'Fahrenheit', 'Kelvin']
+            };
+
+            const catSelect = document.getElementById('conv-category');
+            const fromSelect = document.getElementById('conv-from');
+            const toSelect = document.getElementById('conv-to');
+            const inputVal = document.getElementById('conv-value');
+            const outputVal = document.getElementById('conv-output');
+
+            function initConverter() {
+                const cat = catSelect.value;
+                fromSelect.innerHTML = ''; toSelect.innerHTML = '';
+                const options = cat === 'temp' ? units.temp : Object.keys(units[cat]);
+                options.forEach(u => {
+                    fromSelect.add(new Option(u, u)); toSelect.add(new Option(u, u));
+                });
+                // Default pick meters/centimeters or similar depending on indexes
+                if (cat === 'length') {
+                    fromSelect.value = "Meter (m)";
+                    toSelect.value = "Centimeter (cm)";
+                } else {
+                    toSelect.selectedIndex = 1;
+                }
+                runConversion();
+            }
+
+            function runConversion() {
+                const val = parseFloat(inputVal.value);
+                if (isNaN(val)) { outputVal.innerText = '0'; return; }
+                const cat = catSelect.value;
+                const from = fromSelect.value;
+                const to = toSelect.value;
+                let result;
+
+                if (cat === 'temp') {
+                    let celsius;
+                    if (from === 'Celsius') celsius = val;
+                    else if (from === 'Fahrenheit') celsius = (val - 32) * 5/9;
+                    else celsius = val - 273.15;
+
+                    if (to === 'Celsius') result = celsius;
+                    else if (to === 'Fahrenheit') result = (celsius * 9/5) + 32;
+                    else result = celsius + 273.15;
+                    
+                    outputVal.innerText = result.toFixed(4) + " °" + to[0];
+                } else {
+                    const factorFrom = units[cat][from];
+                    const factorTo = units[cat][to];
+                    result = (val * factorFrom) / factorTo;
+                    
+                    // Handles highly advanced astronomical or subatomic metrics with clean scientific notation scaling limits
+                    if (result < 1e-4 || result > 1e7) {
+                        outputVal.innerText = result.toExponential(6);
+                    } else {
+                        outputVal.innerText = result.toLocaleString(undefined, {maximumFractionDigits: 6});
+                    }
+                }
+            }
+
+            catSelect.onchange = initConverter;
+            inputVal.oninput = runConversion;
+            fromSelect.onchange = runConversion;
+            toSelect.onchange = runConversion;
+
+            // Keyboard tracking layers
+            document.addEventListener('keydown', (e) => {
+                if (convView.classList.contains('active')) return;
+                const key = e.key;
+                if (key === 'ArrowLeft' && cursorPosition > 0) cursorPosition--, updateDisplay();
+                if (key === 'ArrowRight' && cursorPosition < currentInput.length) cursorPosition++, updateDisplay();
+                if (key === 'Enter') calculate();
+                if (key === 'Backspace') backspace();
+            });
+
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>

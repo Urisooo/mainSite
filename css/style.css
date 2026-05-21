@@ -1,0 +1,171 @@
+/* ==========================================================================
+   1. GLOBAL ARCHITECTURE & SYSTEM TOKENS
+   ========================================================================== */
+:root {
+    --bg-dark: #0f172a;
+    --bg-solid-dark: #0b0f19;
+    --card-bg-pc: rgba(30, 41, 59, 0.55);
+    --card-bg-mobile: #1e293b;
+    --accent-blue: #38bdf8;
+    --accent-glow: rgba(56, 189, 248, 0.35);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ==========================================================================
+   HIGH CONTRAST & ACCESSIBILITY TEXT MODIFIERS
+   ========================================================================== */
+.text-readable-silver {
+    color: #cbd5e1 !important; /* Premium light silver for fluid readability */
+    font-weight: 400;
+}
+
+.text-high-contrast-label {
+    color: #e2e8f0 !important; /* Sharp bright light gray for small card labels */
+    font-weight: 600;
+}
+
+.text-high-contrast-footer {
+    color: #cbd5e1 !important; /* Highly visible slate tint for copyright rows */
+    font-weight: 500;
+}
+
+/* Typography Utility Extensions */
+.tracking-wider { letter-spacing: 0.12em; }
+.tracking-tight { letter-spacing: -0.025em; }
+.monospace { font-family: 'Courier New', Courier, monospace; }
+.bg-dark { background-color: var(--bg-solid-dark) !important; }
+
+.extra-small {
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Universal Transition Frameworks */
+.nav-link, .btn, .project-card, .footer-link {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   2. DESKTOP & LAPTOP VISUAL ENGINE (Glassmorphism & Cyber Glow)
+   ========================================================================== */
+@media (min-width: 769px) {
+    /* Dynamic Cyber Blur Overlay Background */
+    main {
+        background-image: radial-gradient(circle at 85% 20%, rgba(56, 189, 248, 0.07) 0%, transparent 45%);
+    }
+
+    /* Fixed Navbar Translucency */
+    .navbar {
+        backdrop-filter: blur(12px);
+        background-color: rgba(15, 23, 42, 0.75) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 18px 0;
+    }
+
+    .navbar-nav .nav-link:hover {
+        color: var(--accent-blue) !important;
+        text-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    /* PC Showcase Grid Elements: Glass Overlay & Elevation Pull */
+    .project-card {
+        background: var(--card-bg-pc) !important;
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 20px !important;
+    }
+
+    .project-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45), 0 0 25px var(--accent-glow) !important;
+        border-color: rgba(56, 189, 248, 0.4) !important;
+    }
+
+    /* Premium Button Hover Micro-Interactions */
+    .btn-info:hover {
+        background-color: #7dd3fc !important;
+        box-shadow: 0 0 20px var(--accent-glow);
+        transform: translateY(-1px);
+    }
+
+    .btn-outline-info:hover {
+        box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+    }
+
+    /* Horizontal Footer Spacing & Links */
+    .footer-link {
+        color: #94a3b8; /* Increased base visible brightness value */
+        text-decoration: none;
+        margin: 0 15px;
+    }
+
+    .footer-link:hover {
+        color: var(--accent-blue);
+    }
+}
+
+/* ==========================================================================
+   3. MOBILE & TABLET VISUAL ENGINE (Streamlined Minimalist Dark UI)
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* Responsive Fluid Header Resizing */
+    .display-2 { font-size: 2.4rem !important; font-weight: 800 !important; }
+    .display-3 { font-size: 2.0rem !important; }
+    .display-4 { font-size: 1.6rem !important; }
+
+    /* Compact Solid Navbar Header Dropdowns */
+    .navbar {
+        background-color: #090d16 !important;
+        padding: 12px 0;
+    }
+
+    .navbar-collapse {
+        background-color: #090d16;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    /* Solid Dynamic Contrast Blocks for Mobile Grid Setup */
+    .project-card {
+        background: var(--card-bg-mobile) !important;
+        border: none !important;
+        border-radius: 16px !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25) !important;
+        padding: 15px !important;
+    }
+
+    /* Full Width Touch Targets (Completely Thumb Accessible) */
+    .project-card .btn {
+        width: 100%;
+        padding: 12px;
+        font-weight: 600;
+        border-radius: 50px !important;
+    }
+
+    /* Stacked Functional Navigation Items Inside Footer */
+    .footer-link {
+        display: block;
+        padding: 12px 0;
+        color: #94a3b8;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .footer-link:last-child {
+        border-bottom: none;
+    }
+}
