@@ -7,9 +7,7 @@
     <title>Ultimate Calculator | Pro Suite</title>
 
     <style>
-        /* ==========================================================================
-           1. GLOBAL VARIABLES & BASE STYLES
-           ========================================================================== */
+  
         :root {
             --bg-dark: #0f172a;
             --calc-bg-pc: rgba(30, 41, 59, 0.75);
@@ -39,7 +37,7 @@
             overflow: hidden;
         }
 
-        /* Navigation Floating Back Button */
+   
         .home-fixed {
             position: fixed;
             bottom: 25px;
@@ -59,9 +57,7 @@
             z-index: 9999;
         }
 
-        /* ==========================================================================
-           2. TABS NAVIGATION
-           ========================================================================== */
+      
         .tab-container {
             display: flex;
             background: rgba(0, 0, 0, 0.3);
@@ -88,9 +84,7 @@
             color: var(--bg-dark);
         }
 
-        /* ==========================================================================
-           3. CHASSIS & SECTIONS
-           ========================================================================== */
+       
         .calculator {
             position: relative;
             width: 100%;
@@ -108,9 +102,7 @@
         .view-section { display: none; }
         .view-section.active { display: block; }
 
-        /* ==========================================================================
-           4. CALCULATOR SPECIFIC UI
-           ========================================================================== */
+     
         .display {
             background-color: #020617;
             border-radius: 16px;
@@ -152,9 +144,7 @@
         .mode-toggle { background: var(--btn-toggle); grid-column: span 4; }
         .calculator.sci-active .mode-toggle { grid-column: span 5; }
 
-        /* ==========================================================================
-           5. UNIT CONVERTER UI
-           ========================================================================== */
+        
         .converter-container { padding: 10px 0; }
         .conv-group { margin-bottom: 20px; }
         .conv-label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
@@ -170,9 +160,7 @@
         }
         #conv-output { font-size: 20px; font-weight: 700; color: var(--accent-blue); word-wrap: break-word; font-family: monospace; }
 
-        /* ==========================================================================
-           6. HISTORY DRAWER
-           ========================================================================== */
+      
         .history-panel {
             position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: #111827; z-index: 100; transition: 0.3s; padding: 20px; box-sizing: border-box;
@@ -184,9 +172,7 @@
         .item-expr { font-size: 12px; color: #94a3b8; }
         .item-res { font-size: 16px; color: #fff; font-weight: bold; }
 
-        /* ==========================================================================
-           7. THEMES & RESPONSIVE
-           ========================================================================== */
+        
         @media (min-width: 769px) {
             .calculator { background: var(--calc-bg-pc); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
             button:hover { filter: brightness(1.2); }
@@ -305,7 +291,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- UI Elements ---
+           
             const calcChassis = document.getElementById('calcChassis');
             const toggleBtn = document.getElementById('toggleBtn');
             const resultLeft = document.getElementById('text-left');
@@ -326,7 +312,7 @@
             let isSciMode = false;
             let memory = [];
 
-            // --- Tab Switching Logic ---
+            
             calcTab.addEventListener('click', () => {
                 calcTab.classList.add('active'); convTab.classList.remove('active');
                 calcView.classList.add('active'); convView.classList.remove('active');
@@ -341,7 +327,7 @@
                 initConverter();
             });
 
-            // --- Calculator Engine ---
+            
             document.querySelector('.buttons').addEventListener('click', (e) => {
                 const target = e.target;
                 if (!target.matches('button')) return;
@@ -433,7 +419,7 @@
                 resultRight.innerText = format(currentInput.slice(cursorPosition));
             }
 
-            // --- History Logic ---
+            
             document.getElementById('openHistory').onclick = () => historyPanel.classList.add('open');
             document.getElementById('closeHistory').onclick = () => historyPanel.classList.remove('open');
             document.getElementById('clearHistory').onclick = () => { memory = []; renderHistory(); };
@@ -448,7 +434,7 @@
                 });
             }
 
-            // --- Comprehensive Unit Converter Database (Base unit meters 'm' / grams 'g') ---
+          
             const units = {
                 length: {
                     "Attometer (am)": 1e-18,
@@ -495,7 +481,7 @@
                 options.forEach(u => {
                     fromSelect.add(new Option(u, u)); toSelect.add(new Option(u, u));
                 });
-                // Default pick meters/centimeters or similar depending on indexes
+               
                 if (cat === 'length') {
                     fromSelect.value = "Meter (m)";
                     toSelect.value = "Centimeter (cm)";
@@ -529,7 +515,7 @@
                     const factorTo = units[cat][to];
                     result = (val * factorFrom) / factorTo;
                     
-                    // Handles highly advanced astronomical or subatomic metrics with clean scientific notation scaling limits
+                   
                     if (result < 1e-4 || result > 1e7) {
                         outputVal.innerText = result.toExponential(6);
                     } else {
@@ -543,7 +529,7 @@
             fromSelect.onchange = runConversion;
             toSelect.onchange = runConversion;
 
-            // Keyboard tracking layers
+         
             document.addEventListener('keydown', (e) => {
                 if (convView.classList.contains('active')) return;
                 const key = e.key;

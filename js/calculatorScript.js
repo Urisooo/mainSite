@@ -1,8 +1,6 @@
-/* ==========================================================================
-   CALCULATOR APPLICATION ENGINE
-   ========================================================================== */
+
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Element Selections
+    
     const calcChassis = document.getElementById('calcChassis');
     const toggleBtn = document.getElementById('toggleBtn');
     const eqKey = document.getElementById('eqKey');
@@ -14,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isEvaluated = false;
     let isSciModeActive = false;
 
-    // 1. Initial Interface Layout Binding Event Routing
+   
     buttonsContainer.addEventListener('click', (event) => {
         const target = event.target;
         if (!target.matches('button')) return;
@@ -38,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 2. Toggle Mode Drawer System Switch Layout Frame Logic
+   
     function toggleSciPanel() {
         isSciModeActive = !isSciModeActive;
         
@@ -55,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 3. Core String Value Append Stack Logic
+
     function append(value) {
         if (isEvaluated) {
             if (!isNaN(value) || value === '.' || value.startsWith('Math.')) {
@@ -72,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplay();
     }
 
-    // 4. Global Screen Flush Clear Actions
+   
     function clearDisplay() {
         currentInput = '0';
         historyDisplay.innerText = '';
@@ -80,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplay();
     }
 
-    // 5. Delete Handling Logic Block
+   
     function backspace() {
         if (currentInput.endsWith('Math.PI')) {
             currentInput = currentInput.slice(0, -7);
@@ -95,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplay();
     }
 
-    // 6. Direct Operational Scientific Math Computational Processing
+   
     function scientific(type) {
         try {
             calculateRawValueWithoutInterfaceUpdate();
@@ -147,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(e) {}
     }
 
-    // 7. Base Total Calculator Operations Parser
+   
     function calculate() {
         try {
             let ExpressionToParse = currentInput.replace(/×/g, '*').replace(/÷/g, '/');
@@ -163,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplay();
     }
 
-    // 8. Visual Presentation Conversion Interceptor
+
     function updateDisplay() {
         let renderingText = currentInput
             .replace(/\*\*/g, '^')
@@ -172,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resultDisplay.innerText = renderingText;
     }
 
-    // 9. Native Keyboard Port Input Routing Maps Handling
+ 
     document.addEventListener('keydown', (event) => {
         const key = event.key;
         if (!isNaN(key) || ['+', '-', '*', '/', '.', '%'].includes(key)) {

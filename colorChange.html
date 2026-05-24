@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: rgb(30, 41, 59);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        transition: 0.5s;
+
+    }
+
+    .container {
+        background-color: rgba(0, 0, 0, 0.2);
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        width: 400px;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+    }
+
+    #colorCode {
+        background-color: white;
+        color: black;
+        border: 20px;
+        padding: 10px 15px;
+        display: inline-block;
+        margin-bottom: 25px;
+        font-weight: bold;
+    }
+
+    button {
+        border: none;
+        padding: 15px 18px;
+        border-radius: 15px;
+        background-color: #ffc107;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        opacity: 0.8;
+    }
+</style>
+
+
+<body>
+
+
+
+
+    <div class="container">
+        <h1>Color Changing App</h1>
+        <p>Click The Button To Change The Background Color</p>
+        <div id="colorCode">rgb(30,41,59)</div>
+        <br>
+        <button id="ChangeColorBtn">Change Color</button>
+    </div>
+
+    <script>
+        const colorCodeArea = document.getElementById("colorCode");
+        const colorChangeBtn = document.getElementById("ChangeColorBtn");
+
+
+        colorChangeBtn.addEventListener("click", () => {
+            let Red = Math.floor(Math.random() * 230);
+            let Green = Math.floor(Math.random() * 230);
+            let Blue = Math.floor(Math.random() * 230);
+
+            let newColor = `rgb(${Red},${Green},${Blue})`;
+            document.body.style.backgroundColor = newColor;
+            colorCodeArea.textContent = newColor;
+    
+        })
+
+    </script>
+<footer class="bg-dark text-white text-center py-5" style="background-color: #0b0f19 !important;">
+        <div class="container">
+            <div class="mb-4">
+                <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                <a href="FAQ.html" class="footer-link">FAQ</a>
+                <a href="cookie.html" class="footer-link">Cookie Policy</a>
+            </div>
+            <p class="mb-0 small">&copy; 2026 Uras Uckun. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+
+</html>
